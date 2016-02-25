@@ -1,0 +1,278 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+	<title>PhaserBreakout</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+function preload() {
+	// Load all the assets...
+	game.load.image('blueBrick', 'assets/BlueBrick.png');
+	game.load.image('redBrick', 'assets/RedBrick.png');
+	game.load.image('orangeBrick', 'assets/OrangeBrick.png');
+	game.load.image('yellowBrick', 'assets/YellowBrick.png');
+	game.load.image('greenBrick', 'assets/GreenBrick.png');
+	game.load.image('paddle', 'assets/paddle.png');
+	game.load.image('ball', 'assets/ball.png');
+}
+
+// Put global variables here...
+var blueBricks, redBricks, orangeBricks, yellowBricks, greenBricks, paddle;
+var score = 0;
+
+function create() {
+	/*
+	/
+	/ Initialize the game...
+	/
+	*/
+	
+	// Enable Arcade Physics
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+	
+	// Set up brick groups
+	blueBricks = game.add.group();
+	redBricks = game.add.group();
+	orangeBricks = game.add.group();
+	yellowBricks = game.add.group();
+	greenBricks = game.add.group();
+	
+	// Enable physics on bricks
+	blueBricks.enableBody = true;
+	redBricks.enableBody = true;
+	orangeBricks.enableBody = true;
+	yellowBricks.enableBody = true;
+	greenBricks.enableBody = true;
+	
+	//
+	// Add bricks...
+	//
+	
+	// Red...
+	for (var i = 0; i < 11; i++) {
+		var redBrick = redBricks.create(i * 80, 10, 'redBrick');
+		redBrick.enableBody = true;
+		redBrick.body.immovable = true;
+	}
+	for (var i = 0; i < 11; i++) {
+		var redBrick = redBricks.create(i * 80, 40, 'redBrick');
+		redBrick.enableBody = true;
+		redBrick.body.immovable = true;
+	}
+	
+	// Orange...
+	for (var i = 0; i < 11; i++) {
+		var orangeBrick = orangeBricks.create(i * 80, 70, 'orangeBrick');
+		orangeBrick.enableBody = true;
+		orangeBrick.body.immovable = true;
+	}
+	for (var i = 0; i < 11; i++) {
+		var orangeBrick = orangeBricks.create(i * 80, 100, 'orangeBrick');
+		orangeBrick.enableBody = true;
+		orangeBrick.body.immovable = true;
+	}
+	
+	// Yellow...
+	for (var i = 0; i < 11; i++) {
+		var yellowBrick = yellowBricks.create(i * 80, 130, 'yellowBrick');
+		yellowBrick.enableBody = true;
+		yellowBrick.body.immovable = true;
+	}
+	for (var i = 0; i < 11; i++) {
+		var yellowBrick = yellowBricks.create(i * 80, 160, 'yellowBrick');
+		yellowBrick.enableBody = true;
+		yellowBrick.body.immovable = true;
+	}
+	
+	// Green...
+	for (var i = 0; i < 11; i++) {
+		var greenBrick = greenBricks.create(i * 80, 190, 'greenBrick');
+		greenBrick.enableBody = true;
+		greenBrick.body.immovable = true;
+	}
+	for (var i = 0; i < 11; i++) {
+		var greenBrick = greenBricks.create(i * 80, 220, 'greenBrick');
+		greenBrick.enableBody = true;
+		greenBrick.body.immovable = true;
+	}
+	
+	// Blue...
+	for (var i = 0; i < 11; i++) {
+		var blueBrick = blueBricks.create(i * 80, 250, 'blueBrick');
+		blueBrick.enableBody = true;
+		blueBrick.body.immovable = true;
+	}
+	for (var i = 0; i < 11; i++) {
+		var blueBrick = blueBricks.create(i * 80, 280, 'blueBrick');
+		blueBrick.enableBody = true;
+		blueBrick.body.immovable = true;
+	}
+	
+	// Add the paddle
+	paddle = game.add.sprite(300, game.world.height - 35, 'paddle'); 
+	
+	game.physics.arcade.enable(paddle);
+	paddle.body.immovable = true;
+	
+	// Add the ball
+	ball = game.add.sprite(300, game.world.height / 2 + 20, 'ball');
+	
+	game.physics.arcade.enable(ball);
+	ball.body.collideWorldBounds = true;
+	ball.body.bounce.y = 3;
+	ball.body.velocity.y = 150;
+	ball.body.velocity.x = 10;
+	
+}
+
+function update() {
+	/*
+	/
+	/ Constant updates...
+	/
+	*/
+	game.physics.arcade.overlap(ball, paddle, touchPlayer, null, this);
+	game.physics.arcade.overlap(ball, redBricks, touchRedBrick, null, this);
+	game.physics.arcade.overlap(ball, orangeBricks, touchOrangeBrick, null, this);
+	game.physics.arcade.overlap(ball, yellowBricks, touchYellowBrick, null, this);;
+	game.physics.arcade.overlap(ball, greenBricks, touchGreenBrick, null, this);;
+	game.physics.arcade.overlap(ball, blueBricks, touchBrick, null, this);
+	
+	function touchBrick(ball, brick) {
+		score = score + 10;
+		brick.kill();
+		ball.body.velocity.y = 150;
+		var diff = Math.abs(ball.body.x - brick.body.x);
+		var diff2 = Math.abs(ball.body.x - (brick.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+	}
+	
+	function touchGreenBrick(ball, brick) {
+		score = score + 10;
+		brick.kill();
+		ball.body.velocity.y = 170;
+		var diff = Math.abs(ball.body.x - brick.body.x);
+		var diff2 = Math.abs(ball.body.x - (brick.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+	}
+	
+	function touchYellowBrick(ball, brick) {
+		score = score + 10;
+		brick.kill();
+		ball.body.velocity.y = 190;
+		var diff = Math.abs(ball.body.x - brick.body.x);
+		var diff2 = Math.abs(ball.body.x - (brick.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+	}
+	
+	function touchOrangeBrick(ball, brick) {
+		score = score + 10;
+		brick.kill();
+		ball.body.velocity.y = 210;
+		var diff = Math.abs(ball.body.x - brick.body.x);
+		var diff2 = Math.abs(ball.body.x - (brick.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+	}
+	
+	function touchRedBrick(ball, brick) {
+		score = score + 10;
+		brick.kill();
+		ball.body.velocity.y = 230;
+		var diff = Math.abs(ball.body.x - brick.body.x);
+		var diff2 = Math.abs(ball.body.x - (brick.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < brick.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+	}
+	
+	
+	
+	function touchPlayer(ball, paddle) {
+		ball.body.velocity.y
+		ball.body.velocity.y = ball.body.velocity.y * -1
+		var diff = Math.abs(ball.body.x - paddle.body.x);
+		var diff2 = Math.abs(ball.body.x - (paddle.body.x+172));
+		if (diff < 10) {
+			ball.body.velocity.x = ball.body.velocity.x * -1;
+		}
+		if (diff < paddle.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) - 50;
+		}
+		if (diff2 < paddle.body.width/2) {
+			ball.body.velocity.x = (ball.body.velocity.x * -1) + 50;
+		}
+		
+	}
+	
+	cursors = game.input.keyboard.createCursorKeys();
+	
+	if (cursors.left.isDown) {
+		paddle.body.x -= 10;
+	}
+	if (cursors.right.isDown) {
+		paddle.body.x += 10;
+	}
+	
+	if (ball.body.y >= game.world.height - 32) {
+		alert("Game Over. Score: " + score);
+		location.reload();
+	}
+	
+	if (score == 1000) {
+		alert("You Win! Score 1000!");
+		location.reload();
+	}
+	
+	console.log(paddle.body.x);
+	
+}
+</script>
